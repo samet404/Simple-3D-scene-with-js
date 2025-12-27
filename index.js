@@ -5,7 +5,6 @@ game.height = 800
 const BACKGROUND = '#000000'
 const FOREGROUND = '#50ff50'
  
-
 const ctx = game.getContext("2d")
 
 function clear() {
@@ -28,9 +27,26 @@ function screen(p) {
   return screen
 }
 
-function line() {
+
+function rotate_xz({x, y, z}, angle) {
+  console.log('rotate_xz', {x,y,z, angle})
+    const c = Math.cos(angle);
+    const s = Math.sin(angle);
+    return {
+        x: x*c-z*s,
+        y,
+        z: x*s+z*c,
+    };
+}
+
+
+function line(p1, p2) {
   ctx.lineWidth = 2
-  ctx.strokeStyle = ''
+  ctx.strokeStyle = FOREGROUND
+  ctx.beginPath()
+  ctx.moveTo(p1.x, p1.y)
+  ctx.lineTo(p2.x, p2.y)
+  ctx.stroke()
 }
 
 function project({x, y, z}) {
@@ -40,11 +56,11 @@ function project({x, y, z}) {
   }
 }
 
-const totalDuration = 5000
+const totalDuration = 3000
 let duration = totalDuration
 let prevTime = null
 
-const startZ = 1
+const startZ = 2
 const endZ = 2.5
 const path =  endZ - startZ
 
@@ -53,7 +69,7 @@ function frame(time) {
     prevTime = time
     requestAnimationFrame(frame)
     return
-  }
+ }
   
   const dt = time - prevTime
   duration -= dt
@@ -65,13 +81,28 @@ function frame(time) {
   clear()
 
   const remainProgress = duration / totalDuration
-  const z = endZ - (path * remainProgress)
-  
+  const z = endZ   
   console.log('z: ', z)
-  point(screen(project({x: -0.5, y: 0.5, z } )), 10, 10)
-  point(screen(project({x: 0.5, y: 0.5, z } )), 10, 10)
-  point(screen(project({x: -0.5, y: -0.5, z } )), 10, 10)
-  point(screen(project({x: 0.5, y: -0.5, z } )), 10, 10)
+
+  const rotation = Math.P*3 * remainProgress
+
+  // Draw the square lines
+  line(screen(project(rotate_xz({x: -0.5, y: 0.5, z }, rotation))), screen(project(rotate_xz({x: 0.5, y: 0.5, z }, rotation))))
+  line(screen(project(rotate_xz({x: -0.5, y: 0.5, z }, rotation))), screen(project(rotate_xz({x: -0.5, y: -0.5, z }, rotation) )))
+  line(screen(project(rotate_xz({x: -0.5, y: -0.5, z }, rotation))), screen(project(rotate_xz({x: 0.5, y: -0.5, z }, rotation))))
+  line(screen(project(rotate_xz({x: 0.5, y: -0.5, z }, rotation))), screen(project(rotate_xz({x: 0.5, y: 0.5, z }, rotation) )))
+  
+  point(
+    screen(
+      project(
+        rotate_xz({x: -0.5, y: 0.5, z: z }, rotation)
+      )
+    ),
+   10, 10
+  )
+  point(screen(project(rotate_xz({x: 0.5, y: 0.5, z: z}, rotation))), 10, 10)
+  point(screen(project(rotate_xz({x: -0.5, y: -0.5, z: z }, rotation))), 10, 10)
+  point(screen(project(rotate_xz({x: 0.5, y: -0.5, z: z } ,rotation))), 10, 10)
 
 
   prevTime = time
