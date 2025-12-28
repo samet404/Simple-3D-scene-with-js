@@ -1,6 +1,6 @@
 
-game.width = 800
-game.height = 800
+game.width = window.innerWidth
+game.height = window.innerHeight
 
 const BACKGROUND = '#000000'
 const FOREGROUND = '#50ff50'
@@ -27,16 +27,15 @@ function screen(p) {
   return screen
 }
 
-
 function rotate_xz({x, y, z}, angle) {
-  console.log('rotate_xz', {x,y,z, angle})
-    const c = Math.cos(angle);
-    const s = Math.sin(angle);
-    return {
-        x: x*c-z*s,
-        y,
-        z: x*s+z*c,
-    };
+  const c = Math.cos(angle);
+  const s = Math.sin(angle);
+
+  return {
+      x: x*c-z*s,
+      y,
+      z: x*s+z*c
+  };
 }
 
 
@@ -44,6 +43,7 @@ function line(p1, p2) {
   ctx.lineWidth = 2
   ctx.strokeStyle = FOREGROUND
   ctx.beginPath()
+  console.log('line', p1, p2)
   ctx.moveTo(p1.x, p1.y)
   ctx.lineTo(p2.x, p2.y)
   ctx.stroke()
@@ -61,7 +61,7 @@ let duration = totalDuration
 let prevTime = null
 
 const startZ = 2
-const endZ = 2.5
+const endZ = 3
 const path =  endZ - startZ
 
 function frame(time) {
@@ -84,22 +84,15 @@ function frame(time) {
   const z = endZ   
   console.log('z: ', z)
 
-  const rotation = Math.P*3 * remainProgress
+  const rotation = Math.PI * remainProgress
 
-  // Draw the square lines
   line(screen(project(rotate_xz({x: -0.5, y: 0.5, z }, rotation))), screen(project(rotate_xz({x: 0.5, y: 0.5, z }, rotation))))
+   line(screen(project(rotate_xz({x: -0.5, y: -0.5, z }, rotation))),screen(project(rotate_xz({x: 0.5, y: -0.5, z }, rotation))))
+
   line(screen(project(rotate_xz({x: -0.5, y: 0.5, z }, rotation))), screen(project(rotate_xz({x: -0.5, y: -0.5, z }, rotation) )))
-  line(screen(project(rotate_xz({x: -0.5, y: -0.5, z }, rotation))), screen(project(rotate_xz({x: 0.5, y: -0.5, z }, rotation))))
   line(screen(project(rotate_xz({x: 0.5, y: -0.5, z }, rotation))), screen(project(rotate_xz({x: 0.5, y: 0.5, z }, rotation) )))
   
-  point(
-    screen(
-      project(
-        rotate_xz({x: -0.5, y: 0.5, z: z }, rotation)
-      )
-    ),
-   10, 10
-  )
+  point(screen(project(rotate_xz({x: -0.5, y: 0.5, z: z }, rotation))),10, 10)
   point(screen(project(rotate_xz({x: 0.5, y: 0.5, z: z}, rotation))), 10, 10)
   point(screen(project(rotate_xz({x: -0.5, y: -0.5, z: z }, rotation))), 10, 10)
   point(screen(project(rotate_xz({x: 0.5, y: -0.5, z: z } ,rotation))), 10, 10)
@@ -121,3 +114,5 @@ range.addEventListener("input", (event) => {
     clear()
     point(screen(project({x: 1, y: 1, z: value} )), 10, 10, 'red')
 });
+
+
